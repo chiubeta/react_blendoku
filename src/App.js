@@ -15,18 +15,13 @@ class App extends Component {
             puzzleList: [],
             answerList: [],
             puzzleClickedId: -1,
-            answerClickedId: -1
+            answerClickedId: -1,
+            isPerfect: true
         };
     }
 
     componentDidMount() {
         this.newPuzzle();
-    }
-
-    componentDidUpdate() {
-        if(this.checkAnswer()){
-            this.setState({ level: this.state.level+1 }, this.newPuzzle);
-        }
     }
 
     newPuzzle() {
@@ -127,7 +122,7 @@ class App extends Component {
         }
     }
 
-    checkAnswer() {
+    isCompleted() {
         const puzzleList = this.state.puzzleList;
         const fullColorList = this.state.fullColorList;
         for(let i=0,len=puzzleList.length; i<len; i++){
@@ -144,16 +139,32 @@ class App extends Component {
         const puzzleList = this.state.puzzleList;
         const answerList = this.state.answerList;
 
-        if(puzzleList[i].fixed){
+        const _to = puzzleList[i];
+        const _fromSameSide = puzzleList[puzzleClickedId];
+        const _fromCrossSide = answerList[answerClickedId];
+
+        if(_to.fixed){
             this.setState({puzzleClickedId: -1, answerClickedId: -1});
             return ;
-        } else if(!puzzleList[i].empty && puzzleClickedId === -1 && answerClickedId === -1 ){
+        } else if(!_to.empty && puzzleClickedId === -1 && answerClickedId === -1 ){
             this.setState({puzzleClickedId: i, answerClickedId: -1});
             return ;
         }
 
-        this.exchangeBlocks(puzzleList[puzzleClickedId], answerList[answerClickedId], puzzleList[i])
-        this.setState({puzzleClickedId: -1, answerClickedId: -1});
+        // Completed without any misplacement
+        let isPerfect = this.state.isPerfect;
+        if(!(_to.empty && _fromCrossSide)){
+            isPerfect = false;
+        }
+
+        this.exchangeBlocks(_fromSameSide, _fromCrossSide, _to);
+
+        this.setState({puzzleClickedId: -1, answerClickedId: -1, isPerfect: isPerfect}, () => {
+            if(this.isCompleted()){
+                this.setState({ level: this.state.level+1, isPerfect: true}, this.newPuzzle);
+            }
+        });
+        
     }
 
     onAnswerClicked = (i) => {
@@ -162,27 +173,36 @@ class App extends Component {
         const puzzleList = this.state.puzzleList;
         const answerList = this.state.answerList;
 
-        if(!answerList[i].empty && puzzleClickedId === -1 && answerClickedId === -1 ){
+        const _to = answerList[i];
+        const _fromSameSide = answerList[answerClickedId];
+        const _fromCrossSide = puzzleList[puzzleClickedId];
+
+        if(!_to.empty && puzzleClickedId === -1 && answerClickedId === -1 ){
             this.setState({puzzleClickedId: -1, answerClickedId: i});
             return ;
         }
 
-        this.exchangeBlocks(answerList[answerClickedId], puzzleList[puzzleClickedId], answerList[i])
+        this.exchangeBlocks(_fromSameSide, _fromCrossSide, _to)
         this.setState({puzzleClickedId: -1, answerClickedId: -1});
     }
 
     render() {
         return (
             <div>
-                <BlockList 
-                    list={this.state.puzzleList} 
-                    onBlockClicked={this.onPuzzleClicked}
-                />     
-                <br />
-                <BlockList 
-                    list={this.state.answerList} 
-                    onBlockClicked={this.onAnswerClicked}
-                />          
+                <div className="pure-g">
+                    <div className="pure-u-1-5"><p>Level: {this.state.level}</p></div>
+                    <div className="pure-u-4-5">
+                        <BlockList 
+                            list={this.state.puzzleList} 
+                            onBlockClicked={this.onPuzzleClicked}
+                        />     
+                        <br />
+                        <BlockList 
+                            list={this.state.answerList} 
+                            onBlockClicked={this.onAnswerClicked}
+                        />   
+                    </div>
+                </div>       
             </div>
         )
     }

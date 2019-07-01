@@ -7,6 +7,9 @@
 
 <!-- <img alt="Demo" src="img/demo.JPG" width="70%"> -->
 
+## Demo
+[Live Demo](https://rollingseal.com/demo/react_blendoku)
+
 ## Run it Locally
 ```bash
 git clone https://github.com/chiubeta/react_blendoku.git
