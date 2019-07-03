@@ -24,12 +24,9 @@ class BlockItem extends Component {
 
     render() {
         return (
-            <div tabIndex="-1"
-                style={{
-                	width: "50px", 
-                	height: "50px", 
-                	display: "inline-block", 
-                    borderRadius: "10px", 
+            <div className="block"
+                tabIndex="-1"
+                style={{ 
                 	backgroundColor: (this.props.empty)? "unset": this.props.color,
                     border: "#555555 1px", 
                 	borderStyle: (this.props.empty)? "solid": (this.props.fixed)? "dashed": "unset"

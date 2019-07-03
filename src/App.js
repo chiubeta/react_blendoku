@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import BlockList from './component/BlockList';
+import './app.css';
 
 const SCALE_TOP = 255;
 
@@ -194,6 +195,7 @@ class App extends Component {
                     <div className="pure-u-4-5">
                         <BlockList 
                             list={this.state.puzzleList} 
+                            isVertical={true}
                             onBlockClicked={this.onPuzzleClicked}
                         />     
                         <br />
