@@ -8,31 +8,19 @@ class BlockItem extends Component {
     }
 
     onBlockFocus = (e) => {
-        if(!this.props.empty && !this.props.fixed){
-            e.target.style.borderColor = "white";
-            e.target.style.borderStyle = "solid";
-        }
         this.props.onClick();
-    }
-
-    onBlockBlur = (e) => {
-        if(!this.props.empty && !this.props.fixed){
-            e.target.style.borderColor = "#555555";
-            e.target.style.borderStyle = (this.props.empty)? "solid": (this.props.fixed)? "dashed": "unset";
-        }
     }
 
     render() {
         return (
             <div className="block"
-                tabIndex="-1"
+                tabIndex={(this.props.empty || this.props.fixed)? undefined: "-1"}
                 style={{ 
                 	backgroundColor: (this.props.empty)? "unset": this.props.color,
                     border: "#555555 1px", 
                 	borderStyle: (this.props.empty)? "solid": (this.props.fixed)? "dashed": "unset"
                 }}
                 onClick={this.onBlockFocus}
-                onBlur={this.onBlockBlur}
             ></div>
         )
     }
