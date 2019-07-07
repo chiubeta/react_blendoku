@@ -12,13 +12,14 @@ class BlockItem extends Component {
     }
 
     render() {
+        const { empty, fixed, color } = this.props;
         return (
             <div className="block"
-                tabIndex={(this.props.empty || this.props.fixed)? undefined: "-1"}
+                tabIndex={(empty || fixed)? undefined: "-1"}
                 style={{ 
-                	backgroundColor: (this.props.empty)? "unset": this.props.color,
+                	backgroundColor: (empty)? "unset": color,
                     border: "#555555 1px", 
-                	borderStyle: (this.props.empty)? "solid": (this.props.fixed)? "dashed": "unset"
+                	borderStyle: (empty)? "solid": (fixed)? "dashed": "unset"
                 }}
                 onClick={this.onBlockFocus}
             ></div>

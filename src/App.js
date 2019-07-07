@@ -8,10 +8,12 @@ class App extends Component {
     constructor(props) {
         super(props);
 
+        this.INIT_TOTAL_NUM = 5;
+        this.INIT_FIXED_NUM = 2;
         this.state = {
             level: 1,
-            totalNum: 10,
-            fixedNum: 5,
+            totalNum: this.INIT_TOTAL_NUM,
+            fixedNum: this.INIT_FIXED_NUM,
             fullColorList: [],
             puzzleList: [],
             answerList: [],
@@ -77,7 +79,7 @@ class App extends Component {
     getRandomColorList() {
         const LEVEL = this.state.level;
         const TOTAL_NUM = this.state.totalNum;
-        const SCALE_INC = (SCALE_TOP / TOTAL_NUM) - LEVEL;
+        const SCALE_INC = (SCALE_TOP / TOTAL_NUM) - LEVEL*2;
         const MAX_START_POINT = SCALE_TOP - (TOTAL_NUM*SCALE_INC);
 
         const redStart = this.getRandom(MAX_START_POINT);
@@ -135,11 +137,7 @@ class App extends Component {
     }
 
     onPuzzleClicked = (i) => {
-        const puzzleClickedId = this.state.puzzleClickedId;
-        const answerClickedId = this.state.answerClickedId;
-        const puzzleList = this.state.puzzleList;
-        const answerList = this.state.answerList;
-
+        const { puzzleClickedId, answerClickedId, puzzleList, answerList, isPerfect, level } = this.state;
         const _to = puzzleList[i];
         const _fromSameSide = puzzleList[puzzleClickedId];
         const _fromCrossSide = answerList[answerClickedId];
@@ -153,27 +151,30 @@ class App extends Component {
         }
 
         // Completed without any misplacement
-        let isPerfect = this.state.isPerfect;
+        let newIsPerfect = isPerfect;
         if(!(_to.empty && _fromCrossSide)){
-            isPerfect = false;
+            newIsPerfect = false;
         }
 
         this.exchangeBlocks(_fromSameSide, _fromCrossSide, _to);
 
-        this.setState({puzzleClickedId: -1, answerClickedId: -1, isPerfect: isPerfect}, () => {
-            if(this.isCompleted()){
-                this.setState({ level: this.state.level+1, isPerfect: true}, this.newPuzzle);
-            }
-        });
-        
+        this.setState({puzzleClickedId: -1, answerClickedId: -1, isPerfect: newIsPerfect}, this.setNewLevel);
+    }
+
+    setNewLevel = () => {
+        if(this.isCompleted()){
+            const level = this.state.level;
+            this.setState({ 
+                level: level+1, 
+                isPerfect: true,
+                totalNum: this.INIT_TOTAL_NUM+(level/this.INIT_FIXED_NUM),
+                fixedNum: this.INIT_FIXED_NUM+(level/this.INIT_TOTAL_NUM)
+            }, this.newPuzzle);
+        }
     }
 
     onAnswerClicked = (i) => {
-        const puzzleClickedId = this.state.puzzleClickedId;
-        const answerClickedId = this.state.answerClickedId;
-        const puzzleList = this.state.puzzleList;
-        const answerList = this.state.answerList;
-
+        const { puzzleClickedId, answerClickedId, puzzleList, answerList } = this.state;
         const _to = answerList[i];
         const _fromSameSide = answerList[answerClickedId];
         const _fromCrossSide = puzzleList[puzzleClickedId];
@@ -192,13 +193,14 @@ class App extends Component {
             <div>
                 <div className="pure-g">
                     <div className="pure-u-1-5"><p>Level: {this.state.level}</p></div>
-                    <div className="pure-u-4-5">
+                    <div className="pure-u-1-5">
                         <BlockList 
                             list={this.state.puzzleList} 
                             isVertical={true}
                             onBlockClicked={this.onPuzzleClicked}
-                        />     
-                        <br />
+                        />  
+                    </div>
+                    <div className="pure-u-3-5">
                         <BlockList 
                             list={this.state.answerList} 
                             onBlockClicked={this.onAnswerClicked}
